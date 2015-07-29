@@ -1,0 +1,32 @@
+class SessionsController < ApplicationController
+  def new
+  end
+  
+  def create
+    user = User.find_by(email: params[:session][:email].downcase)
+    if user && user.authenticate(params[:session][:password])
+      log_in user
+      remember user
+      redirect_to user
+      
+      
+    else
+      flash.now[:danger] = 'Invalid email/password combination'
+    render 'new'
+    
+    end
+    
+  end
+  
+  def destroy
+    log_out
+    redirect_to root_url
+  end
+  
+   # Returns true if the given token matches the digest.
+  def authenticated?(remember_token)
+    BCrypt::Password.new(remember_digest).is_password?(remember_token)
+  end
+  
+  
+end
